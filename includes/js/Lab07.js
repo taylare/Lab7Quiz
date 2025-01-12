@@ -1,6 +1,6 @@
 $(document).ready(function() {
-    let username = "";
-    // Define the questions
+    let username = ""; //variable to store username
+   
     const questions = [
         {
             question: "Which animal is the closest living relative to the T-Rex?",
@@ -34,65 +34,63 @@ $(document).ready(function() {
         }
     ];
 
-    // Timer variables
     let timerInterval;
     let timerSeconds = 0;
 
-    // Timer function
     function startTimer() {
-        timerInterval = setInterval(function() {
+        timerInterval = setInterval(function() { //function to incremenet timerSeconds every second
             timerSeconds++;
-            updateTimer();
-        }, 1000);
+            updateTimer(); //update timer display
+        }, 1000); //repeat every second
     }
 
-    // Function to update timer display
+    // function to update timer display
     function updateTimer() {
-        $('#timer').text(formatTime(timerSeconds));
+        $('#timer').text(formatTime(timerSeconds)); //update text of #timer with formatted time
     }
 
     // Function to format time as MM:SS
     function formatTime(seconds) {
-        let minutes = Math.floor(seconds / 60);
-        let remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        let minutes = Math.floor(seconds / 60); //calculating the minutes
+        let remainingSeconds = seconds % 60; //calculating seconds
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`; //if remaining seconds < 10, return 0, else empty string
     }
 
+    //this function loads questions and initialises the quiz
     function loadQuestions() {
-        let delay = 1000; // Initial delay for first question
-        let colorIndex = 0; // Initialize color index
+        let delay = 1000; // delay for first question
+        let colorIndex = 0; // initialising the colour index
     
-        // Array of predefined colors
+        //colours for the card headers
         const colors = ["#caffbf", "#ecbcfd", "#baf2e9", "#fad2e1", "#fff185"];
     
-        function fadeInCard() {
-            // Select the current card and animate its properties
+        function fadeInCard() { //function to fade in each card sequentially 
             $('.card').eq(colorIndex).animate({
-                opacity: 1,
-                top: 0
-            }, 500); // Adjust duration as needed
+                opacity: 1, //fade in 
+                top: 0 //move card to its original position
+            }, 500); //the animation duration
     
-            colorIndex++; // Move to the next card
-    
-            // Call fadeInCard function recursively until all cards are animated
+            colorIndex++; // go to the next card
+            
             if (colorIndex < questions.length) {
-                setTimeout(fadeInCard, 100); // Adjust delay between animations as needed
+                setTimeout(fadeInCard, 100);//delay for the next card to fade in
             }
         }
     
-        // Loop through each question and construct HTML for each card
+        // loop through each question and create the card
         questions.forEach(function(question, index) {
-            // Get the color for the current card header
-            let cardHeaderColor = colors[index % colors.length]; // Cycle through colors without duplicates
+            // get the color for the current card header based on the index
+            let cardHeaderColor = colors[index % colors.length]; // go through colours without duplicates (i.e: 0 % 5 = index 0, 1 % 5 = index 1 etc)
     
-            // Construct HTML for each question card with the assigned header color
+            // make the html for each question card with the assigned header color
             let questionCard = `
                 <div class="card mb-3" style="opacity:0; position:relative; top:-20px;"> <!-- Initially hide the card -->
                     <div class="card-header" style="background-color: ${cardHeaderColor};">
                         <div class="text-center">${index + 1}. ${question.question}</div>
                     </div>
                     <div class="card-body">
-                        <form id="question${index}">
+                        <form id="question${index}"> <!--form for current question-->
+                            <!--iterates over each choice in questions.choices array and creates the html elements -->
                             ${question.choices.map((choice, i) => `
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="question${index}" id="question${index}_choice${i}" value="${choice}">
@@ -100,63 +98,59 @@ $(document).ready(function() {
                                         ${choice}
                                     </label>
                                 </div>
-                            `).join("")}
+                            `).join("")} <!--.join() concatenates the elements for each choice into string-->
                         </form>
                         <a href="#" class="hint">[HINT]</a>
                         <div class="hint-text" style="display: none;">${question.hint}</div>
                     </div>
                 </div>
             `;
-            $('#questions').append(questionCard);
+            $('#questions').append(questionCard); //appending to the questions container
         });
     
-        // Call fadeInCard function after initial delay
+        // call fadeInCard after initial delay
         setTimeout(fadeInCard, delay);
     
-        // Add event listeners for hint functionality
+        //event listeners for hint
         $('.hint').mouseover(function() {
-            $(this).next('.hint-text').fadeIn();
+            $(this).next('.hint-text').fadeIn(); //show hint on hover
         }).mouseout(function() {
-            $(this).next('.hint-text').fadeOut();
+            $(this).next('.hint-text').fadeOut(); //hide hint when mouse isnt hovering over
         });
     }
     
 
    // Function to calculate score
     function calculateScore() {
-        let correctAnswers = 0;
+        let correctAnswers = 0; //count set to 0
         questions.forEach(function(question, index) {
-            let selectedAnswer = $(`input[name='question${index}']:checked`).val();
+            let selectedAnswer = $(`input[name='question${index}']:checked`).val(); //get the selected answer
             if (selectedAnswer === question.answer) {
-                correctAnswers++;
+                correctAnswers++; //if correct, increment counter
             }
         });
         return correctAnswers;
     }
 
-
-    // Function to animate score display
     function animateScoreDisplay() {
-        $('#scoreMessage').fadeIn(3000);
-        // Your code to animate score display here
+        $('#scoreMessage').fadeIn(3000); //score message fades in over 3 seconds
+        
     }
 
-    $('#beginQuiz').click(function() {
-        // Get the username from the input field
-        username = $('#username').val().trim();
+    $('#beginQuiz').click(function() { //when the begin quiz btn is clicked, this function is executed
+        username = $('#username').val().trim(); 
         if (username === "") {
             alert("Please enter your name.");
-            return;
+            return; //handling if username isnt entered
         }
-        $('#initialPage').fadeOut(1000, function() {
-            // Hide the initial page
+        //hiding the intial page over 1 second
+        $('#initialPage').fadeOut(1000, function() { 
             $(this).remove(); // Remove the initial page from the DOM
             $('#welcomeMessage').text("Welcome, " + username + ". Good luck!");
-            $('#quizPage').fadeIn(500); // Show the quiz page
+            $('#quizPage').fadeIn(500); // Show the quiz page after 0.5 seconds
             startTimer();
             loadQuestions();
-            // Call displayResults function with username as an argument
-            displayResults(0, username); // Pass 0 as score for now, as the score is calculated later
+            displayResults(0, username); 
         });
     });
     
@@ -165,12 +159,12 @@ $(document).ready(function() {
         let message = "";
         if (score === 5) {
             message = `<span class="highlight-pink">${username}!</span><br><span class="highlight-pink">You scored ${score}/${questions.length}. Perfect!</span><br><span class="highlight-green">You finished in ${timeTaken} seconds!</span>`;
-            // Flash timer results and message 10 times rapidly
+            // flash timer results and message 10 times rapidly if perfect score
             for (let i = 0; i < 10; i++) {
                 setTimeout(function() {
                     $('#timerResults').fadeIn(100).fadeOut(100);
-                    $('#scoreMessage').fadeOut(100).fadeIn(100); // Flash the score message
-                }, i * 200); // Change the value (200ms) for faster or slower flashing
+                    $('#scoreMessage').fadeOut(100).fadeIn(100);
+                }, i * 200); 
             }
         } else if (score === 0) {
             message = `<span class="highlight-pink">${username}!</span><br><span class="highlight-pink">You scored ${score}/${questions.length}. You suck! (jk)</span><br><span class="highlight-green">You finished in ${timeTaken} seconds!</span>`;
@@ -178,37 +172,31 @@ $(document).ready(function() {
             message = `<span class="highlight-pink">${username}!</span><br><span class="highlight-pink">You scored ${score}/${questions.length}.</span><br><span class="highlight-green">You finished in ${timeTaken} seconds!</span>`;
         }
         $('#scoreMessage').html(message);
-        // Fade in username over 3 seconds
         $('#usernameDisplay').html(username + "!").fadeIn(3000);
-        // Animate score display
         $('#scoreMessage').fadeIn(3000);
     }
     
 
     $('#submitAnswers').click(function() {
-        // Stop timer
+        //stop the timer
         clearInterval(timerInterval);
     
-        // Calculate score
+        // store the score total
         let score = calculateScore();
     
-        // Scroll to the top of the page
-        $('html, body').animate({ scrollTop: 0 }, 'slow');
+        // send to the top of the page 
+        $('html, body').animate({ scrollTop: 0 }, 'slow'); // '0' pixels from the top (slowly)
     
-        // Show score underneath the timer after a delay
+        // show score underneath the timer
         setTimeout(function() {
             $('#scoreDisplay').text(`Your score is: ${score} out of ${questions.length}`).fadeIn();
         }, 1000); 
     
-        // Display modal after 3 seconds
+        // show results modal after 3 seconds
         setTimeout(function() {
             $('#resultsModal').modal('show');
-            // Pass score to displayResults function
             displayResults(score);
         }, 3000);
-    
-        // Animate score display
         animateScoreDisplay();
-    });
-    
+    });   
 });
